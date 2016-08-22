@@ -54,7 +54,7 @@ int main(int argc, char **argv)
   FILE *f;
   struct sigaction saio;
   struct termios oldtio,newtio;
-  char fname[21];
+  char fname[24];
   char line2[20];
   char sweep_steps;
   char *sweep_data;
@@ -134,7 +134,7 @@ int main(int argc, char **argv)
     res += read(fd,buf+res,255);
   }
   res=0;
-  strftime(fname,21,"%Y_%m_%d_%H_%M_%S.txt",localt);
+  strftime(fname,24,"%Y_%m_%d_%H_%M_%S.txt",localt);
   f=fopen(fname,"w");
   fprintf(f,"--------------------\r\n");
   strftime(line2,20,"%Y-%m-%d-%H:%M:%S",localt);

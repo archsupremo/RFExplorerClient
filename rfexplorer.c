@@ -135,19 +135,19 @@ int main(int argc, char **argv)
   }
   res=0;
   //strftime(fname,24,"%Y_%m_%d_%H_%M_%S.txt",localt);
-  strftime(fname,24,"%Y_%m_%d.txt",localt);
-  f=fopen(fname,"w");
-  fprintf(f,"--------------------\r\n");
-  strftime(line2,20,"%Y-%m-%d-%H:%M:%S",localt);
-  fprintf(f,"%s\r\n",line2);
-  fprintf(f,"\r\n");
-  fprintf(f,"\r\n");
-  fprintf(f,"Frequency(mHZ)\tSignal (dBm)\r\n");
+  //strftime(fname,24,"%Y_%m_%d.txt",localt);
+  //f=fopen(fname,"w");
+  //fprintf(f,"--------------------\r\n");
+  //strftime(line2,20,"%Y-%m-%d-%H:%M:%S",localt);
+  //fprintf(f,"%s\r\n",line2);
+  //fprintf(f,"\r\n");
+  //fprintf(f,"\r\n");
+  //fprintf(f,"Frequency(mHZ)\tSignal (dBm)\r\n");
   for(i=0;i<sweep_steps;i++){
     printf("%ld\t%6.6f\r\n",(atol(argv[2])+i*(atol(argv[3])-atol(argv[2]))/sweep_steps)*1000,-1*(((float)(unsigned char)buf[i+4]))/2);
     //fprintf(f,"%ld\t%6.6f\r\n",(atol(argv[2])+i*(atol(argv[3])-atol(argv[2]))/sweep_steps)*1000,-1*(((float)(unsigned char)buf[i+4]))/2);
   }
-  fclose(f);
+  //fclose(f);
   return 0;
 }
 void signal_handler_IO (int status)

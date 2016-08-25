@@ -55,7 +55,7 @@ w.show();
 def update():
     global curva
     grafica_plot.clear()
-    
+
     p1 = subprocess.Popen(["./rfexplorer", name_device, min_feq, max_feq, min_top, max_top], stdout=subprocess.PIPE)
     str = p1.communicate()[0]
     resultados = str.split("\r\n")
@@ -67,7 +67,7 @@ def update():
             datos = [frequency_signal[0]]
 
             print frequency_signal[1]
-            multiplicador = int(float(frequency_signal[1])) * -1
+            multiplicador = 120 - int(float(frequency_signal[1])) * -1
             vals = np.hstack([datos] * multiplicador)
 
             y, x = np.histogram(vals, bins=np.linspace(float(min_feq), float(max_feq), 150))

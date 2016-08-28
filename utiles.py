@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+def limites_grafica(grafica_plot, min_feq, max_feq, min_top, max_top):
+    grafica_plot.setRange(xRange=[float(min_feq), float(max_feq)], yRange=[-float(max_top), -float(min_top)])
+    #grafica_plot.setLimits(xMin=float(min_feq), xMax=float(max_feq), yMin=-float(max_top), yMax=-float(min_top))
+
 def obtener_datos_x(index, datosx):
     for i in range(len(datosx)):
         if datosx[i] > index:

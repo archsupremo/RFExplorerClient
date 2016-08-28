@@ -13,6 +13,8 @@ import pyqtgraph as pg
 import serial
 import utiles
 
+lectura = True
+
 name_device = "/dev/ttyUSB0"
 min_feq = "0412000"
 max_feq = "0472000"
@@ -45,17 +47,14 @@ grafica_plot.setLabel('right', 'Signal (dBm)')
 #    config.show()
 
 # Se establecen maximos y minimos para la grafica, tanto en rango se medicion como para mostrar
-grafica_plot.setRange(xRange=[float(min_feq), float(max_feq)], yRange=[-float(max_top), -float(min_top)])
-#grafica_plot.setLimits(xMin=float(min_feq), xMax=float(max_feq), yMin=-float(max_top), yMax=-float(min_top))
+utiles.limites_grafica(grafica_plot, min_feq, max_feq, min_top, max_top)
 
 # Elemento de la clase Plot, que es la curva de la grafica
 curva = grafica_plot.plot()
 
-#cross hair
+# cross hair
 vLine = pg.InfiniteLine(angle=90, movable=False)
 grafica_plot.addItem(vLine, ignoreBounds=True)
-#hLine = pg.InfiniteLine(angle=0, movable=False)
-#grafica_plot.addItem(hLine, ignoreBounds=True)
 
 vb = grafica_plot.plotItem.vb
 def mouseMoved(evt):
@@ -66,32 +65,84 @@ proxy = pg.SignalProxy(grafica_plot.scene().sigMouseMoved, rateLimit=60, slot=mo
 
 # Se anade la grafica al panel y se muestra.
 grafica.addWidget(grafica_plot)
+
+# Pantalla de configuracion
+def feq_minima_changed(sb):
+    global grafica_plot, min_feq, max_feq, min_top, max_top
+    min_feq = str(sb.value())
+    utiles.limites_grafica(grafica_plot, min_feq, max_feq, min_top, max_top)
+
+def feq_maxima_changed(sb):
+    global grafica_plot, min_feq, max_feq, min_top, max_top
+    max_feq = str(sb.value())
+    utiles.limites_grafica(grafica_plot, min_feq, max_feq, min_top, max_top)
+
+def signal_minima_changed(sb):
+    global grafica_plot, min_feq, max_feq, min_top, max_top
+    max_top = str(-sb.value())
+    utiles.limites_grafica(grafica_plot, min_feq, max_feq, min_top, max_top)
+
+def signal_maxima_changed(sb):
+    global grafica_plot, min_feq, max_feq, min_top, max_top
+    min_top = str(-sb.value())
+    utiles.limites_grafica(grafica_plot, min_feq, max_feq, min_top, max_top)
+
+spins = [
+    ("Frecuencia Minima (mHZ)", pg.SpinBox(value=float(min_feq), dec=True, minStep=1, step=1), feq_minima_changed),
+    ("Frecuencia Maxima (mHZ)", pg.SpinBox(value=float(max_feq), dec=True, minStep=1, step=1), feq_maxima_changed),
+    ("Signal Minima (dBm)", pg.SpinBox(value=-float(max_top), dec=True, minStep=1, step=1), signal_minima_changed),
+    ("Signal Maxima (dBm)", pg.SpinBox(value=-float(min_top), dec=True, minStep=1, step=1), signal_maxima_changed)
+]
+
+for text, spin, function_changed in spins:
+    label = QtGui.QLabel(text)
+    config.addWidget(label)
+    config.addWidget(spin)
+    spin.sigValueChanged.connect(function_changed)
+
+def iniciar_lectura():
+    global Lectura
+    lectura = True
+
+def parar_lectura():
+    global Lectura
+    lectura = False
+
+start = QtGui.QPushButton('Empezar Lectura')
+stop = QtGui.QPushButton('Parar Lectura')
+
+start.clicked.connect(iniciar_lectura)
+stop.clicked.connect(parar_lectura)
+
+config.addWidget(start)
+config.addWidget(stop)
+
 w.show();
 
 # Funcion que actualiza los datos cada X tiempo.
 def update():
-    #utiles.update()
-    global curva, grafica_plot
+    global lectura, curva, grafica_plot, name_device, min_feq, max_feq, min_top, max_top
     x = []
     y = []
+    dats_rfexplorer = ["./rfexplorer", name_device, min_feq, max_feq, min_top, max_top]
 
-    p1 = subprocess.Popen(["./rfexplorer", name_device, min_feq, max_feq, min_top, max_top], stdout=subprocess.PIPE)
-    str = p1.communicate()[0]
-    resultados = str.split("\r\n")
+    p1 = subprocess.Popen(dats_rfexplorer, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    str, err = p1.communicate()
+    if str and lectura:
+        resultados = str.split("\r\n")
 
-    for i, res in enumerate(resultados):
-        if res != '':
-            frequency_signal = res.split("\t")
-            x += [int(float(frequency_signal[0]))/1000]
-            y += [float(frequency_signal[1])]
-    curva.setData(x=x, y=y);
+        for i, res in enumerate(resultados):
+            if res != '':
+                frequency_signal = res.split("\t")
+                x += [int(float(frequency_signal[0]))/1000]
+                y += [float(frequency_signal[1])]
+        curva.setData(x=x, y=y);
 
 # Timer donde se indica que funcion se va a repetir cada X tiempo para actualizar la grafica
 timer = pg.QtCore.QTimer()
 timer.timeout.connect(update)
-timer.start(50)
+timer.start(5000)
 
-## Start Qt event loop unless running in interactive mode or using pyside.
 if __name__ == '__main__':
     import sys
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):

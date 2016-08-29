@@ -11,9 +11,9 @@ import math
 import numpy as np
 import pyqtgraph as pg
 import serial
+import sys
 import utiles
-
-lectura = True
+from timer import Timer
 
 name_device = "/dev/ttyUSB0"
 min_feq = "0412000"
@@ -33,8 +33,6 @@ grafica = Dock("Grafica RFExplorer", size=(1250, 850))
 config = Dock("Configuracion", size=(500, 850), closable=True)
 area.addDock(grafica, 'left')
 area.addDock(config, 'right')
-
-# Creacion de los botones de configuracion en el Dock config
 
 # Se crea la grafica, se le da un nombre y se crea las labels abajo e izquierda y derecha
 grafica_plot = pg.PlotWidget(title="RFExplorer")
@@ -87,6 +85,8 @@ def signal_maxima_changed(sb):
     min_top = str(-sb.value())
     utiles.limites_grafica(grafica_plot, min_feq, max_feq, min_top, max_top)
 
+
+# Creacion de los botones de configuracion en el Dock config
 spins = [
     ("Frecuencia Minima (mHZ)", pg.SpinBox(value=float(min_feq), dec=True, minStep=1, step=1), feq_minima_changed),
     ("Frecuencia Maxima (mHZ)", pg.SpinBox(value=float(max_feq), dec=True, minStep=1, step=1), feq_maxima_changed),
@@ -100,24 +100,10 @@ for text, spin, function_changed in spins:
     config.addWidget(spin)
     spin.sigValueChanged.connect(function_changed)
 
-def iniciar_lectura():
-    global Lectura
-    lectura = True
-
-def parar_lectura():
-    global Lectura
-    lectura = False
-
 start = QtGui.QPushButton('Empezar Lectura')
 stop = QtGui.QPushButton('Parar Lectura')
-
-start.clicked.connect(iniciar_lectura)
-stop.clicked.connect(parar_lectura)
-
 config.addWidget(start)
 config.addWidget(stop)
-
-w.show();
 
 # Funcion que actualiza los datos cada X tiempo.
 def update():
@@ -128,7 +114,7 @@ def update():
 
     p1 = subprocess.Popen(dats_rfexplorer, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     str, err = p1.communicate()
-    if str and lectura:
+    if str:
         resultados = str.split("\r\n")
 
         for i, res in enumerate(resultados):
@@ -138,32 +124,16 @@ def update():
                 y += [float(frequency_signal[1])]
         curva.setData(x=x, y=y);
 
-# Timer donde se indica que funcion se va a repetir cada X tiempo para actualizar la grafica
-timer = pg.QtCore.QTimer()
-timer.timeout.connect(update)
-timer.start(5000)
 
+# Timer donde se indica que funcion se va a repetir cada X tiempo para actualizar la grafica
+t = Timer(update, 50)
+t.start()
+
+start.clicked.connect(t.iniciar_lectura)
+stop.clicked.connect(t.parar_lectura)
+
+w.show();
 if __name__ == '__main__':
     import sys
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()
-
-
-"""
-while True:
-    subprocess.Popen(["clear"])
-    print("--------------------------")
-    print("Informacion del rfexplorer")
-    print("--------------------------")
-    p1 = subprocess.Popen(["./rfexplorer", name_device, min_feq, max_feq, min_top, max_top], stdout=subprocess.PIPE)
-    str = p1.communicate()[0]
-    resultados = str.split("\r\n")
-
-    for i, res in enumerate(resultados):
-        if res != '':
-            frequency_signal = res.split("\t")
-            print "%d => {F => %s, S => %s}" % (i, frequency_signal[0], frequency_signal[1])
-
-    #print(p1.communicate()[0])
-    time.sleep(1)
-"""

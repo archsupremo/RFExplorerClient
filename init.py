@@ -25,8 +25,7 @@ app = QtGui.QApplication([])
 w = QtGui.QMainWindow()
 area = DockArea()
 w.setCentralWidget(area)
-w.setGeometry(0, 0, 1750, 850)
-#w.showMaximized()
+#w.setGeometry(0, 0, 1750, 850)
 
 # Se crean las areas (Docks)
 grafica = Dock("Grafica RFExplorer", size=(1250, 850))
@@ -132,7 +131,7 @@ t.start()
 start.clicked.connect(t.iniciar_lectura)
 stop.clicked.connect(t.parar_lectura)
 
-w.show();
+w.showMaximized()
 if __name__ == '__main__':
     import sys
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):

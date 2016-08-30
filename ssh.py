@@ -4,12 +4,9 @@ client = paramiko.SSHClient()
 client.load_system_host_keys()
 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-client.connect("172.36.0.204", username="pi", password="pi")
+client.connect("5.40.205.100", username="pi", password="pi")
+stdin, stdout, stderr = client.exec_command('Desktop/RFExplorerClient/rfexplorer /dev/ttyUSB0 0400000 0500000 050 120')
 
-stdin, stdout, stderr = client.exec_command('ls -l')
-"""
-stdin, stdout, stderr = client.exec_command('web/RFExplorerClient/rfexplorer /dev/ttyUSB0 0400000 0500000 050 120')
-"""
 for line in stdout:
     print line.strip('\r\n')
 

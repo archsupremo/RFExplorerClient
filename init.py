@@ -15,9 +15,9 @@ import sys
 import utiles
 from timer import Timer
 
-name_device = "/dev/ttyUSB0"
-min_feq = "0412000"
-max_feq = "0472000"
+name_device = "/dev/ttyUSB1"
+min_feq = "1400000"
+max_feq = "1500000"
 min_top = "050"
 max_top = "120"
 
@@ -46,8 +46,10 @@ grafica_plot.setLabel('right', 'Signal (dBm)')
 # Se establecen maximos y minimos para la grafica, tanto en rango se medicion como para mostrar
 utiles.limites_grafica(grafica_plot, min_feq, max_feq, min_top, max_top)
 
+
 # Elemento de la clase Plot, que es la curva de la grafica
-curva = grafica_plot.plot()
+curva = pg.PlotCurveItem()
+grafica_plot.addItem(curva)
 
 # cross hair
 vLine = pg.InfiniteLine(angle=90, movable=False)
@@ -106,7 +108,7 @@ config.addWidget(stop)
 
 # Funcion que actualiza los datos cada X tiempo.
 def update():
-    global lectura, curva, grafica_plot, name_device, min_feq, max_feq, min_top, max_top
+    global lectura, grafica_plot, curva, name_device, min_feq, max_feq, min_top, max_top
     x = []
     y = []
     dats_rfexplorer = ["./rfexplorer", name_device, min_feq, max_feq, min_top, max_top]
@@ -121,8 +123,8 @@ def update():
                 frequency_signal = res.split("\t")
                 x += [int(float(frequency_signal[0]))/1000]
                 y += [float(frequency_signal[1])]
-        curva.setData(x=x, y=y);
-
+		print "x => " + frequency_signal[0] + ", y => " + frequency_signal[1]
+        curva.setData(x=x, y=y, clear=True)
 
 # Timer donde se indica que funcion se va a repetir cada X tiempo para actualizar la grafica
 t = Timer(update, 50)

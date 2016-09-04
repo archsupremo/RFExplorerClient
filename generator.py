@@ -3,12 +3,11 @@ import pyqtgraph as pg
 import time
 import paramiko
 
-class Timer(QThread):
+class Generator(QThread):
 
-    def __init__(self, ip, username, password, function_update, time):
+    def __init__(self, ip, username, password, function_generator):
         QThread.__init__(self)
-        self.function_update = function_update
-        self.time = time
+        self.function_generator = function_generator
 
         self.ip = ip
         self.username = username
@@ -18,27 +17,21 @@ class Timer(QThread):
         self.client_ssh.load_system_host_keys()
         self.client_ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-        self.parar = False
-
     def __del__(self):
         self.wait()
 
     def run(self):
-        self.client_ssh.connect(self.ip, username=self.username, password=self.password)
-        while not self.parar:
-            self.function_update(self.client_ssh)
-            time.sleep(self.time / 1000)
+        #self.client_ssh.connect(self.ip, username=self.username, password=self.password)
+        self.function_generator(self.client_ssh)
+        #self.client_ssh.close()
 
-    def iniciar_timer(self):
-        self.parar = False
+    def iniciar_emision(self):
         self.start()
 
-    def parar_timer(self):
-        self.parar = True
+    def parar_emision(self):
+        self.client_ssh.connect(self.ip, username=self.username, password=self.password)
+        client_ssh.exec_command("Desktop/RFExplorer_Command/RFExplorer_Command %s %s" % ('/dev/ttyUSB0', 'CP0'))
         self.client_ssh.close()
-
-    def cambiar_refresco(self, time):
-        self.time = time
 
     def cambiar_ip(self, ip):
         self.ip = ip

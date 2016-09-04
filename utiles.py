@@ -3,6 +3,8 @@
 from logging.handlers import TimedRotatingFileHandler
 from time import gmtime, strftime
 from pyqtgraph.Qt import QtGui, QtCore
+from pyqtgraph.dockarea import *
+
 import sys
 
 def texts(config, texts):
@@ -20,13 +22,17 @@ def spins(config, spins):
         label = QtGui.QLabel(text)
         config.addWidget(label)
         config.addWidget(spin)
-        spin.sigValueChanged.connect(function_changed)
+
+        if function_changed is not None:
+            spin.sigValueChanged.connect(function_changed)
 
 def crear_log(filename_log, ex):
+    """
     instant_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
     f = open(filename_log, "a")
     f.write("%s: %s \r\n\r\n" % (instant_time, str(ex)))
     f.close()
+    """
 
 def limites_grafica(grafica_plot, min_feq, max_feq, min_top, max_top):
     grafica_plot.setRange(xRange=[float(min_feq), float(max_feq)], yRange=[-float(max_top), -float(min_top)])

@@ -17,7 +17,6 @@ class Timer(QThread):
         self.client_ssh = paramiko.SSHClient()
         self.client_ssh.load_system_host_keys()
         self.client_ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
         self.parar = False
 
     def __del__(self):

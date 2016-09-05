@@ -18,16 +18,18 @@ from timer import Timer
 from generator import Generator
 from generator_feq import GeneratorFeq
 
-# ip_analyzer = "5.40.205.100"
-ip_analyzer = "172.36.0.204"
+ip_analyzer = "5.40.205.100"
+# ip_analyzer = "172.36.0.204"
 username_analyzer = "pi"
 password_analyzer = "pi"
 #-----------------------------
-ip_generator = "172.36.0.204"
+ip_generator= "5.40.205.100"
+# ip_generator = "172.36.0.204"
 username_generator = "pi"
 password_generator = "pi"
 #-----------------------------
-name_device = "/dev/ttyUSB0"
+name_device_generator = "/dev/ttyUSB0"
+name_device_analyzer = "/dev/ttyUSB1"
 min_feq = "0400000"
 max_feq = "0500000"
 min_top = "050"
@@ -211,11 +213,11 @@ config_generator.addWidget(crear_lista_frecuencias)
 
 # Funcion que actualiza los datos cada X tiempo.
 def update(client_ssh):
-    global curva, grafica_plot, name_device, min_feq, max_feq, min_top, max_top
+    global curva, grafica_plot, name_device_analyzer, min_feq, max_feq, min_top, max_top
     x = []
     y = []
 
-    stdin, stdout, stderr = client_ssh.exec_command("Desktop/RFExplorerClient/rfexplorer %s %s %s %s %s" % (name_device, min_feq, max_feq, min_top, max_top))
+    stdin, stdout, stderr = client_ssh.exec_command("Desktop/RFExplorerClient/rfexplorer %s %s %s %s %s" % (name_device_analyzer, min_feq, max_feq, min_top, max_top))
     if stdout:
         for line in stdout:
             res = line.strip('\r\n')
@@ -230,13 +232,13 @@ def update(client_ssh):
 
 # Funcion para mandar los comandos a signal generator.
 def function_generator(client_ssh):
-    global name_device, feq_generator, step_generator, feq_step_generator, signal_generator, limite_feq, atenuacion_generator
+    global name_device_generator, feq_generator, step_generator, feq_step_generator, signal_generator, limite_feq, atenuacion_generator
 
     atenuacion_generator_number = 0
     if atenuacion_generator:
         atenuacion_generator_number = 1
 
-    cadena_command = "Desktop/RFExplorer_Command/RFExplorerCommand %s " % (name_device)
+    cadena_command = "Desktop/RFExplorer_Command/RFExplorerCommand %s " % (name_device_generator)
     if limite_feq:
         cadena_command += '"C3-F:%d,%d,%d,%d,%d,%0.1f"' % (int(feq_generator), atenuacion_generator_number, signal_generator, step_generator, feq_step_generator, 0.1)
     else:

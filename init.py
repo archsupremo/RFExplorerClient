@@ -173,7 +173,7 @@ spin_feq_step_generator = pg.SpinBox(value=feq_step_generator, dec=True, minStep
 spin_step_generator.setEnabled(limite_feq)
 spin_feq_step_generator.setEnabled(limite_feq)
 spins_generator = [
-    ("Frecuencia Inicial (mHZ)", pg.SpinBox(value=float(feq_generator), dec=True, minStep=1, step=1), feq_generator_changed),
+    ("Frecuencia Inicial (HZ)", pg.SpinBox(value=float(feq_generator), dec=True, minStep=1, step=1), feq_generator_changed),
     ("Valor Step (>0)", spin_step_generator, step_generator_changed),
     ("Freq Step KHZ", spin_feq_step_generator, feq_step_generator_changed),
     ("Signal (0-3)", pg.SpinBox(value=signal_generator, dec=True, minStep=1, step=1), signal_generator_changed)
@@ -236,13 +236,14 @@ def function_generator(client_ssh):
     if atenuacion_generator:
         atenuacion_generator_number = 1
 
-    cadena_command = "Desktop/RFExplorer_Command/RFExplorer_Command %s " % (name_device)
+    cadena_command = "Desktop/RFExplorer_Command/RFExplorerCommand %s " % (name_device)
     if limite_feq:
-        cadena_command += '"C3-F:%s,%d,%d,%d,%d,%0.1f"' % (feq_generator, atenuacion_generator_number, signal_generator, step_generator, feq_step_generator, 0.1)
+        cadena_command += '"C3-F:%d,%d,%d,%d,%d,%0.1f"' % (int(feq_generator), atenuacion_generator_number, signal_generator, step_generator, feq_step_generator, 0.1)
     else:
-        cadena_command += '"C3-F:%s,%d,%d"' % (feq_generator, atenuacion_generator_number, signal_generator)
+        cadena_command += '"C3-F:%d,%d,%d"' % (int(feq_generator), atenuacion_generator_number, signal_generator)
+
     print cadena_command
-    #client_ssh.exec_command(cadena_command)
+    client_ssh.exec_command(cadena_command)
 
 # Timer donde se indica que funcion se va a repetir cada X tiempo para actualizar la grafica.
 t = Timer(ip_analyzer, username_analyzer, password_analyzer, update, 50)

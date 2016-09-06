@@ -1,0 +1,10 @@
+# ip_analyzer=5.40.205.100
+
+name_device_analyzer=/dev/ttyUSB1
+ip_analyzer=172.36.0.204
+username_analyzer=pi
+password_analyzer=pi
+min_feq=0400000
+max_feq=0500000
+min_top=050
+max_top=120

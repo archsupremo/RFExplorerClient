@@ -8,7 +8,7 @@ import paramiko
 import utiles
 
 class GeneratorFeq(QtGui.QMainWindow):
-    def __init__(self, ip, username, password, parent=None):
+    def __init__(self, ip, username, password, name_device, parent=None):
         QtGui.QMainWindow.__init__(self, parent)
 
         self.timer = pg.QtCore.QTimer()
@@ -24,7 +24,7 @@ class GeneratorFeq(QtGui.QMainWindow):
 
         self.feqs_numbers = []
         self.texts_color = []
-        self.name_device = "/dev/ttyUSB0"
+        self.name_device = name_device
         self.contador = 0
         self.rows = 0
 
@@ -144,3 +144,6 @@ class GeneratorFeq(QtGui.QMainWindow):
 
     def cambiar_password(self, password):
         self.password = password
+
+    def cambiar_name_device(self, name_device):
+        self.name_device = name_device

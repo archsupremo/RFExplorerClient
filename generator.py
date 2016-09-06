@@ -5,10 +5,10 @@ import paramiko
 
 class Generator(QThread):
 
-    def __init__(self, ip, username, password, function_generator):
+    def __init__(self, ip, username, password, function_generator, function_parar):
         QThread.__init__(self)
         self.function_generator = function_generator
-        self.name_device = "/dev/ttyUSB0"
+        self.function_parar = function_parar
         self.ip = ip
         self.username = username
         self.password = password
@@ -30,7 +30,7 @@ class Generator(QThread):
 
     def parar_emision(self):
         self.client_ssh.connect(self.ip, username=self.username, password=self.password)
-        self.client_ssh.exec_command("Desktop/RFExplorer_Command/RFExplorerCommand %s %s" % (self.name_device, 'CP0'))
+        self.function_parar(self.client_ssh)
         self.client_ssh.close()
 
     def cambiar_ip(self, ip):

@@ -7,6 +7,56 @@ from pyqtgraph.dockarea import *
 
 import sys
 
+def extract(locales, array_config):
+    for var,res in array_config.iteritems():
+        locales[var] = res
+
+def leer_config(name_config):
+    config = {}
+    f = open(name_config, "r")
+    for linea in f.readlines():
+        if linea[0] == '#' or not linea or linea == "\r\n": continue
+
+        line = linea.split('=')
+        string_res = line[1].replace("\r\n", "").strip()
+
+        if string_res == 'True':
+            string_res = True
+        elif string_res == 'False':
+            string_res = False
+
+        string_res = string_res
+        config[line[0].strip()] = string_res
+    return config
+
+def escribir_config_analyzer(name_device, ip, username, password, min_feq, max_feq, min_top, max_top):
+    f = open("config_analyzer.txt", "w")
+    f.write("name_device_analyzer=%s\r\n" % (name_device))
+    f.write("ip_analyzer=%s\r\n" % (ip))
+    f.write("username_analyzer=%s\r\n" % (username))
+    f.write("password_analyzer=%s\r\n" % (password))
+    f.write("min_feq=%s\r\n" % (min_feq))
+    f.write("max_feq=%s\r\n" % (max_feq))
+    f.write("min_top=%s\r\n" % (min_top))
+    f.write("max_top=%s\r\n" % (max_top))
+    f.close()
+
+def escribir_config_generator(name_device, ip, username, password, feq_generator,
+                     signal_generator, step_generator, feq_step_generator,
+                     limite_feq, atenuacion_generator):
+    f = open("config_generator.txt", "w")
+    f.write("name_device_generator=%s\r\n" % (name_device))
+    f.write("ip_generator=%s\r\n" % (ip))
+    f.write("username_generator=%s\r\n" % (username))
+    f.write("password_generator=%s\r\n" % (password))
+    f.write("feq_generator=%s\r\n" % (feq_generator))
+    f.write("signal_generator=%s\r\n" % (signal_generator))
+    f.write("step_generator=%s\r\n" % (step_generator))
+    f.write("feq_step_generator=%s\r\n" % (feq_step_generator))
+    f.write("limite_feq=%s\r\n" % (limite_feq))
+    f.write("atenuacion_generator=%s\r\n" % (atenuacion_generator))
+    f.close()
+
 def texts(config, texts):
     for text, spin, function_changed, modo_echo in texts:
         label = QtGui.QLabel(text)

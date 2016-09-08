@@ -18,7 +18,6 @@ from timer import Timer
 from generator import Generator
 from generator_feq import GeneratorFeq
 
-
 # ip_analyzer = "5.40.205.100"
 ip_analyzer = "172.36.0.204"
 username_analyzer = "pi"
@@ -106,8 +105,15 @@ def device_changed_analyzer():
 
 def ip_changed_analyzer():
     global ip_analyzer, t
-    ip_analyzer = str(texts_analyzer[1][1].text())
-    t.cambiar_ip(ip_analyzer)
+    validacion = utiles.validacion(str(texts_analyzer[1][1].text()),
+                                   "^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$",
+                                   "La ip no puede ser correcta.")
+
+    if validacion:
+        ip_analyzer = str(texts_analyzer[1][1].text())
+        t.cambiar_ip(ip_analyzer)
+
+    texts_analyzer[1][1].setText(ip_analyzer)
 
 def user_changed_analyzer():
     global username_analyzer, t
@@ -121,13 +127,25 @@ def pass_changed_analyzer():
 
 def feq_minima_changed(sb):
     global grafica_plot, min_feq, max_feq, min_top, max_top
-    min_feq = str(sb.value())
-    utiles.limites_grafica(grafica_plot, min_feq, max_feq, min_top, max_top)
+
+    validacion = utiles.validacion(str(int(sb.value())),
+                                   "^[1-9]+|[0-9]{2,}$",
+                                   "La frecuencia minima debe ser mayor que cero.")
+    if validacion:
+        min_feq = int(sb.value())
+        utiles.limites_grafica(grafica_plot, min_feq, max_feq, min_top, max_top)
+    sb.setValue(min_feq)
 
 def feq_maxima_changed(sb):
     global grafica_plot, min_feq, max_feq, min_top, max_top
-    max_feq = str(sb.value())
-    utiles.limites_grafica(grafica_plot, min_feq, max_feq, min_top, max_top)
+
+    validacion = utiles.validacion(str(int(sb.value())),
+                                   "^[1-9]+|[0-9]{2,}$",
+                                   "La frecuencia maxima debe ser mayor que cero.")
+    if validacion:
+        max_feq = int(sb.value())
+        utiles.limites_grafica(grafica_plot, min_feq, max_feq, min_top, max_top)
+    sb.setValue(max_feq)
 
 def signal_minima_changed(sb):
     global grafica_plot, min_feq, max_feq, min_top, max_top
@@ -149,9 +167,16 @@ def device_changed_generator():
 
 def ip_changed_generator():
     global ip_generator, g, gq
-    ip_generator = str(texts_generator[1][1].text())
-    g.cambiar_ip(ip_generator)
-    gq.cambiar_ip(ip_generator)
+    validacion = utiles.validacion(str(texts_generator[1][1].text()),
+                                   "^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$",
+                                   "La ip no puede ser correcta.")
+
+    if validacion:
+        ip_generator = str(texts_generator[1][1].text())
+        g.cambiar_ip(ip_generator)
+        gq.cambiar_ip(ip_generator)
+
+    texts_generator[1][1].setText(ip_generator)
 
 def user_changed_generator():
     global username_generator, g, gq
@@ -178,19 +203,41 @@ def have_limit_frecuencia(valor_checkbox):
 
 def feq_generator_changed(sb):
     global feq_generator
-    feq_generator = int(sb.value())
+
+    validacion = utiles.validacion(str(int(sb.value())),
+                                   "^[1-9]+|[0-9]{2,}$",
+                                   "La frecuencia debe ser mayor que cero.")
+
+    if validacion: feq_generator = int(sb.value())
+    sb.setValue(int(feq_generator))
 
 def step_generator_changed(sb):
     global step_generator
-    step_generator = int(sb.value())
+
+    validacion = utiles.validacion(str(int(sb.value())),
+                                   "^[1-9]+|[0-9]{2,}$",
+                                   "El valor del step debe ser mayor que uno y numero entero.")
+
+    if validacion: step_generator = int(sb.value())
+    sb.setValue(int(step_generator))
 
 def feq_step_generator_changed(sb):
     global feq_step_generator
-    feq_step_generator = int(sb.value())
+
+    validacion = utiles.validacion(str(int(sb.value())),
+                                   "^[1-9]+|[0-9]{2,}$",
+                                   "El step de la frecuencia debe ser mayor que cero.")
+
+    if validacion: feq_step_generator = int(sb.value())
+    sb.setValue(int(feq_step_generator))
 
 def signal_generator_changed(sb):
     global signal_generator
-    signal_generator = int(sb.value())
+
+    validacion = utiles.validacion(str(int(sb.value())),
+                                       "^[0-3]$",
+                                       "El valor que va a tener la signal debe ser entre 0 y 3.")
+    signal_generator = int(sb.value()) if validacion else sb.setValue(int(signal_generator))
 
 #-------------------------------------------------------------------------------
 # Creacion de los botones de configuracion en el Dock config.
@@ -223,9 +270,9 @@ spin_step_generator.setEnabled(limite_feq)
 spin_feq_step_generator.setEnabled(limite_feq)
 spins_generator = [
     ("Frecuencia Inicial (HZ):", pg.SpinBox(value=float(feq_generator), dec=True, minStep=1, step=1), feq_generator_changed),
-    ("Valor Step (>0):", spin_step_generator, step_generator_changed),
+    ("Valor Step (>1):", spin_step_generator, step_generator_changed),
     ("Freq Step KHZ:", spin_feq_step_generator, feq_step_generator_changed),
-    ("Signal (0-3):", pg.SpinBox(value=signal_generator, dec=True, minStep=1, step=1), signal_generator_changed)
+    ("Signal [0-3]:", pg.SpinBox(value=signal_generator, dec=True, minStep=1, step=1), signal_generator_changed)
 ]
 
 # Creacion de los checkbox's para cambiar los dispositivos sobre los que se consulta informacion
@@ -245,10 +292,12 @@ utiles.spins(config_generator, spins_generator)
 
 # Checkbox's sobre atenuacion y limite de frecuencia en caso de establecerse un limite en la frecuencia.
 limit_frecuencia = QtGui.QCheckBox("Rango de Frecuencia (Y/N)", w)
+limit_frecuencia.setChecked(limite_feq)
 config_generator.addWidget(limit_frecuencia)
 limit_frecuencia.stateChanged.connect(have_limit_frecuencia)
 
 atenuacion_yn = QtGui.QCheckBox("Desea atenuacion? (Y/N)", w)
+atenuacion_yn.setChecked(atenuacion_generator)
 config_generator.addWidget(atenuacion_yn)
 atenuacion_yn.stateChanged.connect(atenuacion_change)
 

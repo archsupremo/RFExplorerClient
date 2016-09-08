@@ -4,8 +4,28 @@ from logging.handlers import TimedRotatingFileHandler
 from time import gmtime, strftime
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.dockarea import *
+from Tkinter import *
 
 import sys
+import re
+import tkMessageBox
+
+def validacion(valor, regex, string_output):
+    patron = re.compile(regex)
+
+    if patron.search(valor) == None:
+        print valor
+        window = Tk()
+        window.wm_withdraw()
+
+        window.geometry("1x1+200+200")#remember its .geometry("WidthxHeight(+or-)X(+or-)Y")
+        window.geometry("1x1+"+str(window.winfo_screenwidth()/2)+"+"+str(window.winfo_screenheight()/2))
+
+        tkMessageBox.showerror(title="Error!!!",message=string_output,parent=window)
+
+        return False
+    print valor
+    return True
 
 def extract(locales, array_config):
     for var,res in array_config.iteritems():

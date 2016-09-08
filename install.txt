@@ -1,0 +1,3 @@
+sudo pip install easygui
+sudo pip install paramiko --upgrade
+sudo pip install pyqtgraph

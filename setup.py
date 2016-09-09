@@ -13,7 +13,7 @@ if 'py2exe' in sys.argv:
             }],
         'zipfile' : None,
         'options' : { 'py2exe' : {
-            #'dll_excludes'   : ['w9xpopen.exe'],
+            'dll_excludes'   : ["MSVCP90.dll"],
             'bundle_files'   : 1,
             'compressed'     : True,
             'optimize'       : 2

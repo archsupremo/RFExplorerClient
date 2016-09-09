@@ -1,3 +1,5 @@
 sudo pip install paramiko --upgrade
 sudo pip install PyQt4
 sudo pip install pyqtgraph
+
+python setup.py py2exe --includes sip

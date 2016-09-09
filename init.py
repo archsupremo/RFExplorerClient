@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+#import numpy as np
+#import serial
+#import paramiko
+
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.dockarea import *
 from pyqtgraph.Point import Point
@@ -11,10 +15,6 @@ import math
 import pyqtgraph as pg
 import sys
 import utiles
-
-#import numpy as np
-#import serial
-#import paramiko
 
 from timer import Timer
 from generator import Generator

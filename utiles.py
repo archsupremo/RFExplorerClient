@@ -14,7 +14,6 @@ def validacion(valor, regex, string_output):
     patron = re.compile(regex)
 
     if patron.search(valor) == None:
-        print valor
         window = Tk()
         window.wm_withdraw()
 
@@ -24,7 +23,6 @@ def validacion(valor, regex, string_output):
         tkMessageBox.showerror(title="Error!!!",message=string_output,parent=window)
 
         return False
-    print valor
     return True
 
 def extract(locales, array_config):

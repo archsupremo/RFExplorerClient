@@ -8,12 +8,14 @@ from array import array
 import subprocess
 import time
 import math
-import numpy as np
 import pyqtgraph as pg
-#import serial
 import sys
-import paramiko
 import utiles
+
+#import numpy as np
+#import serial
+#import paramiko
+
 from timer import Timer
 from generator import Generator
 from generator_feq import GeneratorFeq

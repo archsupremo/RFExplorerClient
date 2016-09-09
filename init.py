@@ -10,7 +10,7 @@ import time
 import math
 import numpy as np
 import pyqtgraph as pg
-import serial
+#import serial
 import sys
 import paramiko
 import utiles

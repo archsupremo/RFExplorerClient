@@ -120,7 +120,7 @@ def mouseMoved(evt, grafica_plot, curva, vb, min_feq, max_feq, vLine):
             x,y = curva.getData()
             try:
                 res =  y[obtener_datos_x(index, x)]
-                grafica_plot.setLabel('top', "<span style='font-size: 12pt'>x=%0.1f, <span style='color: red'>y=%0.1f</span>" % (mousePoint.x(), res))
+                grafica_plot.setLabel('top', "<span style='font-size: 12pt'>x=%0.1f, <span style='color: red'>y=%0.1f</span>" % (mousePoint.x()/1000, res))
             except Exception as ex:
                 crear_log("log.log", ex)
         vLine.setPos(mousePoint.x())

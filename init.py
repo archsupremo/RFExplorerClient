@@ -350,7 +350,7 @@ def update(client_ssh):
     x = []
     y = []
 
-    stdin, stdout, stderr = client_ssh.exec_command("Desktop/RFExplorerClient/rfexplorer %s %s %s %s %s" % (name_device_analyzer, min_feq, max_feq, min_top, max_top))
+    stdin, stdout, stderr = client_ssh.exec_command("Desktop/RFExplorerRead/rfexplorer %s %s %s %s %s" % (name_device_analyzer, min_feq, max_feq, min_top, max_top))
     if stdout:
         for line in stdout:
             res = line.strip('\r\n')
@@ -371,9 +371,9 @@ def function_generator(client_ssh):
     cadena_command = "Desktop/RFExplorer_Command/RFExplorerCommand %s " % (name_device_generator)
 
     if limite_feq:
-        cadena_command += '"C3-F:%d,%d,%d,%d,%d,%0.1f"' % (int(feq_generator), atenuacion_generator_number, signal_generator, step_generator, feq_step_generator, 0.1)
+        cadena_command += '"C3-F:%s,%s,%s,%s,%s,%0.1f"' % (feq_generator, atenuacion_generator_number, signal_generator, step_generator, feq_step_generator, 0.1)
     else:
-        cadena_command += '"C3-F:%d,%d,%d"' % (int(feq_generator), atenuacion_generator_number, signal_generator)
+        cadena_command += '"C3-F:%s,%s,%s"' % (feq_generator, atenuacion_generator_number, signal_generator)
 
     print cadena_command
     client_ssh.exec_command(cadena_command)

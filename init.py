@@ -318,15 +318,15 @@ crear_lista_frecuencias = QtGui.QPushButton('Crear Lista de Frecuencias')
 guardar_config_generator = QtGui.QPushButton('Guardar Configuracion')
 guardar_config_generator.clicked.connect(
     lambda : utiles.escribir_config_generator(name_device_generator,
-                                     ip_generator,
-                                     username_generator,
-                                     password_generator,
-                                     feq_generator,
-                                     signal_generator,
-                                     step_generator,
-                                     feq_step_generator,
-                                     limite_feq,
-                                     atenuacion_generator)
+                                              ip_generator,
+                                              username_generator,
+                                              password_generator,
+                                              feq_generator,
+                                              signal_generator,
+                                              step_generator,
+                                              feq_step_generator,
+                                              limite_feq,
+                                              atenuacion_generator)
 )
 config_generator.addWidget(start_generator)
 config_generator.addWidget(stop_generator)
@@ -390,7 +390,7 @@ g = Generator(ip_generator, username_generator, password_generator, function_gen
 start_generator.clicked.connect(g.iniciar_emision)
 stop_generator.clicked.connect(g.parar_emision)
 
-# Generator donde se realiza la generacion de distintas senal en varias frecuencias.
+# Generator donde se realiza la generacion de distintas signal en varias frecuencias.
 gq = GeneratorFeq(ip_generator, username_generator, password_generator, name_device_generator)
 crear_lista_frecuencias.clicked.connect(gq.show)
 

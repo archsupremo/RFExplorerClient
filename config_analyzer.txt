@@ -1,5 +1,5 @@
 name_device_analyzer=/dev/ttyUSB1
-ip_analyzer=172.36.0.204
+ip_analyzer=5.40.205.100
 username_analyzer=pi
 password_analyzer=pi
 min_feq=450000.0

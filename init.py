@@ -2,7 +2,7 @@
 
 #import numpy as np
 #import serial
-#import paramiko
+import paramiko
 
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.dockarea import *
@@ -343,10 +343,15 @@ config_generator.addWidget(stop_generator)
 config_generator.addWidget(crear_lista_frecuencias)
 config_generator.addWidget(guardar_config_generator)
 
+
+client_ssh = paramiko.SSHClient()
+client_ssh.load_system_host_keys()
+client_ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+client_ssh.connect(ip_analyzer, username=username_analyzer, password=password_analyzer)
 #-------------------------------------------------------------------------------
 # Funcion que actualiza los datos cada X tiempo.
-def update(client_ssh):
-    global curva, grafica_plot, name_device_analyzer, min_feq, max_feq, min_top, max_top
+def update():
+    global curva, grafica_plot, name_device_analyzer, min_feq, max_feq, min_top, max_top, client_ssh
     x = []
     y = []
 
@@ -386,6 +391,11 @@ def function_parar(client_ssh):
 
     print cadena_command
     client_ssh.exec_command(cadena_command)
+
+
+timer = pg.QtCore.QTimer()
+timer.timeout.connect(update)
+timer.start(50)
 
 #-------------------------------------------------------------------------------
 # Timer donde se indica que funcion se va a repetir cada X tiempo para actualizar la grafica.

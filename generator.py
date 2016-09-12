@@ -35,6 +35,7 @@ class Generator(QThread):
 
     def cambiar_ip(self, ip):
         self.ip = ip
+        print self.ip
 
     def cambiar_username(self, username):
         self.username = username

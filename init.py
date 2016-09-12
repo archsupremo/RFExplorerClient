@@ -1,24 +1,24 @@
 #!/usr/bin/python
 
-#import numpy as np
-#import serial
-import paramiko
-
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.dockarea import *
 from pyqtgraph.Point import Point
 from array import array
+from generator import Generator
+from generator_feq import GeneratorFeq
 
 import subprocess
 import time
 import math
 import pyqtgraph as pg
 import sys
+import threading
+import paramiko
 import utiles
 
-from timer import Timer
-from generator import Generator
-from generator_feq import GeneratorFeq
+client_ssh = paramiko.SSHClient()
+client_ssh.load_system_host_keys()
+client_ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
 # ip_analyzer = "5.40.205.100"
 ip_analyzer = "172.36.0.204"
@@ -106,30 +106,26 @@ def device_changed_analyzer():
     name_device_analyzer = str(texts_analyzer[0][1].text())
 
 def ip_changed_analyzer():
-    global ip_analyzer, t
+    global ip_analyzer
     validacion = utiles.validacion(str(texts_analyzer[1][1].text()),
                                    "^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$",
                                    "La ip no puede ser correcta.")
 
     if validacion:
         ip_analyzer = str(texts_analyzer[1][1].text())
-        t.cambiar_ip(ip_analyzer)
 
     texts_analyzer[1][1].setText(ip_analyzer)
 
 def user_changed_analyzer():
-    global username_analyzer, t
+    global username_analyzer
     username_analyzer = str(texts_analyzer[2][1].text())
-    t.cambiar_username(username_analyzer)
 
 def pass_changed_analyzer():
-    global password_analyzer, t
+    global password_analyzer
     password_analyzer = str(texts_analyzer[3][1].text())
-    t.cambiar_password(password_analyzer)
 
 def feq_minima_changed(sb):
     global grafica_plot, min_feq, max_feq, min_top, max_top
-
     validacion = utiles.validacion(str(int(sb.value())),
                                    "^[1-9]+|[0-9]{2,}$",
                                    "La frecuencia minima debe ser mayor que cero.")
@@ -140,7 +136,6 @@ def feq_minima_changed(sb):
 
 def feq_maxima_changed(sb):
     global grafica_plot, min_feq, max_feq, min_top, max_top
-
     validacion = utiles.validacion(str(int(sb.value())),
                                    "^[1-9]+|[0-9]{2,}$",
                                    "La frecuencia maxima debe ser mayor que cero.")
@@ -198,14 +193,12 @@ def atenuacion_change(valor_checkbox):
 
 def have_limit_frecuencia(valor_checkbox):
     global limite_feq, spin_step_generator, spin_feq_step_generator
-
     limite_feq = False if (valor_checkbox == 0) else True
     spin_step_generator.setEnabled(limite_feq)
     spin_feq_step_generator.setEnabled(limite_feq)
 
 def feq_generator_changed(sb):
     global feq_generator
-
     validacion = utiles.validacion(str(int(sb.value())),
                                    "^[1-9]+|[0-9]{2,}$",
                                    "La frecuencia debe ser mayor que cero.")
@@ -215,7 +208,6 @@ def feq_generator_changed(sb):
 
 def step_generator_changed(sb):
     global step_generator
-
     validacion = utiles.validacion(str(int(sb.value())),
                                    "^[1-9]+|[0-9]{2,}$",
                                    "El valor del step debe ser mayor que uno y numero entero.")
@@ -225,7 +217,6 @@ def step_generator_changed(sb):
 
 def feq_step_generator_changed(sb):
     global feq_step_generator
-
     validacion = utiles.validacion(str(int(sb.value())),
                                    "^[1-9]+|[0-9]{2,}$",
                                    "El step de la frecuencia debe ser mayor que cero.")
@@ -235,7 +226,6 @@ def feq_step_generator_changed(sb):
 
 def signal_generator_changed(sb):
     global signal_generator
-
     validacion = utiles.validacion(str(int(sb.value())),
                                        "^[0-3]$",
                                        "El valor que va a tener la signal debe ser entre 0 y 3.")
@@ -274,7 +264,7 @@ spins_generator = [
     ("Frecuencia Inicial (HZ):", pg.SpinBox(value=float(feq_generator), dec=True, minStep=1, step=1), feq_generator_changed),
     ("Valor Step (>1):", spin_step_generator, step_generator_changed),
     ("Freq Step KHZ:", spin_feq_step_generator, feq_step_generator_changed),
-    ("Signal [0-3]:", pg.SpinBox(value=signal_generator, dec=True, minStep=1, step=1), signal_generator_changed)
+    ("Signal [0-3]:", pg.SpinBox(value=signal_generator, dec=True, minStep=1, step=1, from_=0, to=3), signal_generator_changed)
 ]
 
 # Creacion de los checkbox's para cambiar los dispositivos sobre los que se consulta informacion
@@ -343,17 +333,16 @@ config_generator.addWidget(stop_generator)
 config_generator.addWidget(crear_lista_frecuencias)
 config_generator.addWidget(guardar_config_generator)
 
-
-client_ssh = paramiko.SSHClient()
-client_ssh.load_system_host_keys()
-client_ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-client_ssh.connect(ip_analyzer, username=username_analyzer, password=password_analyzer)
 #-------------------------------------------------------------------------------
 # Funcion que actualiza los datos cada X tiempo.
 def update():
     global curva, grafica_plot, name_device_analyzer, min_feq, max_feq, min_top, max_top, client_ssh
     x = []
     y = []
+
+    if client_ssh._transport == None or not client_ssh._transport.is_active():
+        timer.stop()
+        return False
 
     stdin, stdout, stderr = client_ssh.exec_command("Desktop/RFExplorerRead/rfexplorer %s %s %s %s %s" % (name_device_analyzer, min_feq, max_feq, min_top, max_top))
     if stdout:
@@ -379,29 +368,22 @@ def function_generator(client_ssh):
         cadena_command += '"C3-F:%s,%s,%s,%s,%s,%0.1f"' % (feq_generator, atenuacion_generator_number, signal_generator, step_generator, feq_step_generator, 0.1)
     else:
         cadena_command += '"C3-F:%s,%s,%s"' % (feq_generator, atenuacion_generator_number, signal_generator)
-
-    print cadena_command
     client_ssh.exec_command(cadena_command)
 
-# Funcion para parar la emision del signal generator
+# Funcion para parar la emision del signal generator.
 def function_parar(client_ssh):
     global name_device_generator
 
     cadena_command = "Desktop/RFExplorer_Command/RFExplorerCommand %s %s" % (name_device_generator, 'CP0')
-
-    print cadena_command
     client_ssh.exec_command(cadena_command)
-
-
-timer = pg.QtCore.QTimer()
-timer.timeout.connect(update)
-timer.start(50)
 
 #-------------------------------------------------------------------------------
 # Timer donde se indica que funcion se va a repetir cada X tiempo para actualizar la grafica.
-t = Timer(ip_analyzer, username_analyzer, password_analyzer, update, 50)
-start_analyzer.clicked.connect(t.iniciar_timer)
-stop_analyzer.clicked.connect(t.parar_timer)
+timer = pg.QtCore.QTimer()
+timer.timeout.connect(update)
+timer.setInterval(1000)
+start_analyzer.clicked.connect(lambda: (utiles.connect_client_ssh(client_ssh, ip_analyzer, username_analyzer, password_analyzer), timer.start()))
+stop_analyzer.clicked.connect(lambda: (client_ssh.close(), timer.stop()))
 
 # Generator donde se realiza la generacion de senal.
 g = Generator(ip_generator, username_generator, password_generator, function_generator, function_parar)

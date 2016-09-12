@@ -10,6 +10,12 @@ import sys
 import re
 import tkMessageBox
 
+def connect_client_ssh(client_ssh, ip, username, password):
+    try:
+        client_ssh.connect(ip, username=username, password=password)
+    except Exception:
+        None
+
 def validacion(valor, regex, string_output):
     patron = re.compile(regex)
 

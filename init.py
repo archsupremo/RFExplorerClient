@@ -16,6 +16,9 @@ import threading
 import paramiko
 import utiles
 
+from threading import Thread
+import time
+
 client_ssh = paramiko.SSHClient()
 client_ssh.load_system_host_keys()
 client_ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -357,6 +360,9 @@ def update():
     elif stderr:
         print stderr
 
+    time.sleep(1)
+    update()
+
 # Funcion para mandar los comandos a signal generator.
 def function_generator(client_ssh):
     global name_device_generator, feq_generator, step_generator, feq_step_generator, signal_generator, limite_feq, atenuacion_generator
@@ -381,7 +387,13 @@ def function_parar(client_ssh):
 # Timer donde se indica que funcion se va a repetir cada X tiempo para actualizar la grafica.
 timer = pg.QtCore.QTimer()
 timer.timeout.connect(update)
-timer.setInterval(1000)
+timer.setInterval(5000)
+
+utiles.connect_client_ssh(client_ssh, ip_analyzer, username_analyzer, password_analyzer)
+thread = threading.Thread(target=update)
+thread.daemon = True
+thread.start()
+
 start_analyzer.clicked.connect(lambda: (utiles.connect_client_ssh(client_ssh, ip_analyzer, username_analyzer, password_analyzer), timer.start()))
 stop_analyzer.clicked.connect(lambda: (client_ssh.close(), timer.stop()))
 

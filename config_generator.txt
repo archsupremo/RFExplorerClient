@@ -1,8 +1,8 @@
-name_device_generator=/dev/ttyUSB0
-ip_generator=172.36.0.204
+name_device_generator=/dev/ttyUSB1
+ip_generator=172.36.0.131
 username_generator=pi
 password_generator=pi
-feq_generator=475000
+feq_generator=1500000
 signal_generator=3
 step_generator=1
 feq_step_generator=100

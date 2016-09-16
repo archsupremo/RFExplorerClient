@@ -66,6 +66,10 @@ class GeneratorFeq(QtGui.QMainWindow):
         self.rows += 1
 
     def generate(self):
+        if self.client_ssh._transport == None or not self.client_ssh._transport.is_active():
+            self.timer.stop()
+            return False
+
         if self.contador > len(self.feqs_numbers)-1:
             self.contador = 0
 
@@ -85,7 +89,7 @@ class GeneratorFeq(QtGui.QMainWindow):
 
     def iniciar_emision_feqs(self):
         self.cambiar_enabled(False)
-        self.client_ssh.connect(self.ip, username=self.username, password=self.password)
+        utiles.connect_client_ssh(self.client_ssh, self.ip, self.username, self.password)
         self.timer.start(self.spin_time.value()*1000)
 
     def parar_emision_feqs(self):

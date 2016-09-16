@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=INIT PROGRAM
+Comment=Inicia Programa
+Type=Application
+StartupNotify=true
+Path=/home/pi/Desktop/RFExplorerClient
+Exec=python init.py
+Icon=/home/pi/Desktop/RFExplorerClient/log_rentel.png

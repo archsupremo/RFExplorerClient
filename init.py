@@ -355,13 +355,10 @@ def update():
                 frequency_signal = res.split("\t")
                 x += [int(float(frequency_signal[0]))/1000]
                 y += [float(frequency_signal[1])]
-                if x and y:
-                    curva.setData(x=x, y=y, clear=True)
+        if x and y:
+            curva.setData(x=x, y=y, clear=True)
     elif stderr:
         print stderr
-
-    time.sleep(1)
-    update()
 
 # Funcion para mandar los comandos a signal generator.
 def function_generator(client_ssh):
@@ -387,12 +384,7 @@ def function_parar(client_ssh):
 # Timer donde se indica que funcion se va a repetir cada X tiempo para actualizar la grafica.
 timer = pg.QtCore.QTimer()
 timer.timeout.connect(update)
-timer.setInterval(5000)
-
-utiles.connect_client_ssh(client_ssh, ip_analyzer, username_analyzer, password_analyzer)
-thread = threading.Thread(target=update)
-thread.daemon = True
-thread.start()
+timer.setInterval(500)
 
 start_analyzer.clicked.connect(lambda: (utiles.connect_client_ssh(client_ssh, ip_analyzer, username_analyzer, password_analyzer), timer.start()))
 stop_analyzer.clicked.connect(lambda: (client_ssh.close(), timer.stop()))

@@ -267,7 +267,7 @@ spins_generator = [
     ("Frecuencia Inicial (HZ):", pg.SpinBox(value=float(feq_generator), dec=True, minStep=1, step=1), feq_generator_changed),
     ("Valor Step (>1):", spin_step_generator, step_generator_changed),
     ("Freq Step KHZ:", spin_feq_step_generator, feq_step_generator_changed),
-    ("Signal [0-3]:", pg.SpinBox(value=signal_generator, dec=True, minStep=1, step=1, from_=0, to=3), signal_generator_changed)
+    ("Signal [0-3]:", pg.SpinBox(value=signal_generator, dec=True, minStep=1, step=1), signal_generator_changed)
 ]
 
 # Creacion de los checkbox's para cambiar los dispositivos sobre los que se consulta informacion
